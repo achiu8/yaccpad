@@ -5,6 +5,8 @@
   "dependencies": {
     "draft-js": "^0.10.5",
     "draft-js-code": "^0.3.0",
+    "draft-js-prism": "^1.0.6",
+    "prismjs": "^1.15.0",
     "react": "^16.5.2",
     "react-dom": "^16.5.2",
     "react-scripts": "2.0.4"

@@ -1,14 +1,22 @@
 import React, { Component } from 'react';
-import Code from 'draft-js-code';
+import debounce from './debounce';
 import {
   Editor as DraftEditor,
   EditorState,
   ContentState,
   convertFromRaw
 } from 'draft-js';
-import debounce from './debounce';
+import Code from 'draft-js-code';
+import PrismDecorator from 'draft-js-prism';
+import Prism from 'prismjs'
 
 import './Editor.css';
+import 'prismjs/themes/prism.css';
+
+const DECORATOR = new PrismDecorator({
+  prism: Prism,
+  defaultSyntax: 'python'
+});
 
 const contentWithCodeBlock = text => convertFromRaw({
   entityMap: {},
@@ -20,7 +28,7 @@ class Editor extends Component {
     super();
 
     this.state = {
-      editor: EditorState.createWithContent(contentWithCodeBlock('')),
+      editor: EditorState.createWithContent(contentWithCodeBlock(''), DECORATOR),
       socket: new WebSocket(`${window.location.protocol.replace('http', 'ws')}//${window.location.host}/connect`)
     };
   }

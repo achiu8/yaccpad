@@ -2,6 +2,7 @@ import os
 import logging
 import redis
 import gevent
+import ast
 from flask import Flask, render_template
 from flask_sockets import Sockets
 
@@ -23,10 +24,11 @@ class Manager(object):
 
     def __iter_data(self):
         for message in self.pubsub.listen():
-            data = message.get('data')
+            raw_data = message.get('data')
             if message['type'] == 'message':
+                data = ast.literal_eval(raw_data)
                 app.logger.info('Sending message: {}'.format(data))
-                self.last_message = data
+                self.last_message = data['message']
                 yield data
 
     def register(self, client):
@@ -44,7 +46,8 @@ class Manager(object):
     def run(self):
         for data in self.__iter_data():
             for client in self.clients:
-                gevent.spawn(self.send, client, data)
+                if hash(client) != data['from']:
+                    gevent.spawn(self.send, client, data['message'])
     
     def start(self):
         gevent.spawn(self.run)
@@ -63,8 +66,9 @@ def submit(ws):
         message = ws.receive()
 
         if message:
-            app.logger.info('Inserting message: {}'.format(message))
-            redis.publish(REDIS_CHAN, message)
+            data = {'from': hash(ws), 'message': message}
+            app.logger.info('Inserting message: {}'.format(data))
+            redis.publish(REDIS_CHAN, data)
 
 @sockets.route('/receive')
 def receive(ws):

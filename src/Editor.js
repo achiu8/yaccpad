@@ -10,7 +10,7 @@ import debounce from './debounce';
 
 import './Editor.css';
 
-const WEB_SOCKET_URL = 'ws://' + window.location.host;
+const WEB_SOCKET_URL = window.location.protocol.replace('http', 'ws') + '//' + window.location.host;
 
 const contentWithCodeBlock = text => convertFromRaw({
   entityMap: {},

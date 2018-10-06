@@ -29,9 +29,9 @@ class Editor extends Component {
     this.state.socket.onmessage = this.handleReceive;
   }
 
-  sendContent = () => {
+  sendContent = debounce(() => {
     this.state.socket.send(this.state.editor.getCurrentContent().getPlainText());
-  };
+  });
 
   sameContent = content => {
     return this.state.editor.getCurrentContent().getPlainText() === content;
@@ -47,7 +47,7 @@ class Editor extends Component {
   };
 
   handleChange = editor => {
-    this.setState({ editor }, debounce(this.sendContent));
+    this.setState({ editor }, this.sendContent);
   };
 
   handleTab = e => {

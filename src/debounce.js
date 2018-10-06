@@ -1,4 +1,4 @@
-export default (f, interval = 250) => {
+export default (f, interval = 1000) => {
   let timeout;
 
   return (...args) => {

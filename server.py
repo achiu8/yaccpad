@@ -59,8 +59,11 @@ manager.start()
 def root():
     return render_template('index.html')
 
-@sockets.route('/submit')
-def submit(ws):
+@sockets.route('/connect')
+def connect(ws):
+    manager.register(ws)
+    manager.send_last(ws)
+
     while not ws.closed:
         gevent.sleep(0.1)
         message = ws.receive()
@@ -69,11 +72,3 @@ def submit(ws):
             data = {'from': hash(ws), 'message': message}
             app.logger.info('Inserting message: {}'.format(data))
             redis.publish(REDIS_CHAN, data)
-
-@sockets.route('/receive')
-def receive(ws):
-    manager.register(ws)
-    manager.send_last(ws)
-
-    while not ws.closed:
-        gevent.sleep(0.1)

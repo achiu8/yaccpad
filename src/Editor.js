@@ -10,8 +10,6 @@ import debounce from './debounce';
 
 import './Editor.css';
 
-const WEB_SOCKET_URL = window.location.protocol.replace('http', 'ws') + '//' + window.location.host;
-
 const contentWithCodeBlock = text => convertFromRaw({
   entityMap: {},
   blocks: [{ type: 'code-block', text }]
@@ -23,17 +21,16 @@ class Editor extends Component {
 
     this.state = {
       editor: EditorState.createWithContent(contentWithCodeBlock('')),
-      in: new WebSocket(WEB_SOCKET_URL + '/receive'),
-      out: new WebSocket(WEB_SOCKET_URL + '/submit')
+      socket: new WebSocket(`${window.location.protocol.replace('http', 'ws')}//${window.location.host}/connect`)
     };
   }
 
   componentDidMount() {
-    this.state.in.onmessage = this.handleReceive;
+    this.state.socket.onmessage = this.handleReceive;
   }
 
   sendContent = () => {
-    this.state.out.send(this.state.editor.getCurrentContent().getPlainText());
+    this.state.socket.send(this.state.editor.getCurrentContent().getPlainText());
   };
 
   sameContent = content => {
@@ -41,14 +38,12 @@ class Editor extends Component {
   };
 
   handleReceive = ({ data }) => {
-    if (!this.sameContent(data)) {
-      this.setState({
-        editor: EditorState.moveFocusToEnd(EditorState.push(
-          this.state.editor,
-          contentWithCodeBlock(data)
-        ))
-      });
-    }
+    this.setState({
+      editor: EditorState.moveFocusToEnd(EditorState.push(
+        this.state.editor,
+        contentWithCodeBlock(data)
+      ))
+    });
   };
 
   handleChange = editor => {

@@ -8,6 +8,7 @@ import {
 import Code from 'draft-js-code';
 import PrismDecorator from 'draft-js-prism';
 import Prism from 'prismjs'
+import WebSocket from 'reconnecting-websocket';
 
 import './Editor.css';
 import 'prismjs/themes/prism.css';

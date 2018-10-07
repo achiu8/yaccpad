@@ -32,6 +32,7 @@ class Manager(object):
                 yield data
 
     def register(self, client):
+        self.send(client, self.last_message)
         self.clients.append(client)
 
     def send(self, client, data):
@@ -39,9 +40,6 @@ class Manager(object):
             client.send(data)
         except Exception:
             self.clients.remove(client)
-
-    def send_last(self, client):
-        self.send(client, self.last_message)
 
     def run(self):
         for data in self.__iter_data():
@@ -62,7 +60,6 @@ def root():
 @sockets.route('/connect')
 def connect(ws):
     manager.register(ws)
-    manager.send_last(ws)
 
     while not ws.closed:
         gevent.sleep(0.1)

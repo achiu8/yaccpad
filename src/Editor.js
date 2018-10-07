@@ -3,7 +3,6 @@ import debounce from './debounce';
 import {
   Editor as DraftEditor,
   EditorState,
-  ContentState,
   convertFromRaw
 } from 'draft-js';
 import Code from 'draft-js-code';
@@ -27,18 +26,19 @@ class Editor extends Component {
   constructor() {
     super();
 
+    this.socket = new WebSocket(`${window.location.protocol.replace('http', 'ws')}//${window.location.host}/connect`);
+
     this.state = {
       editor: EditorState.createWithContent(contentWithCodeBlock(''), DECORATOR),
-      socket: new WebSocket(`${window.location.protocol.replace('http', 'ws')}//${window.location.host}/connect`)
     };
   }
 
   componentDidMount() {
-    this.state.socket.onmessage = this.handleReceive;
+    this.socket.onmessage = this.handleReceive;
   }
 
   sendContent = debounce(() => {
-    this.state.socket.send(this.state.editor.getCurrentContent().getPlainText());
+    this.socket.send(this.state.editor.getCurrentContent().getPlainText());
   });
 
   sameContent = content => {

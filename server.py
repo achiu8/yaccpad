@@ -3,8 +3,9 @@ import logging
 import redis
 import gevent
 import ast
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify
 from flask_sockets import Sockets
+from subprocess import check_output
 
 REDIS_URL = os.environ['REDIS_URL']
 REDIS_CHAN = 'server'
@@ -56,6 +57,11 @@ manager.start()
 @app.route('/')
 def root():
     return render_template('index.html')
+
+@app.route('/execute')
+def execute():
+    output = check_output(['python', '-c', manager.last_message])
+    return jsonify({'output': output})
 
 @sockets.route('/connect')
 def connect(ws):

@@ -41,10 +41,6 @@ class Editor extends Component {
     this.socket.send(this.state.editor.getCurrentContent().getPlainText());
   });
 
-  sameContent = content => {
-    return this.state.editor.getCurrentContent().getPlainText() === content;
-  };
-
   handleReceive = ({ data }) => {
     this.setState({
       editor: EditorState.moveFocusToEnd(EditorState.push(
@@ -70,7 +66,7 @@ class Editor extends Component {
 
   render() {
     return (
-      <div className="editor">
+      <div className="section editor">
         <DraftEditor
           editorState={this.state.editor}
           onChange={this.handleChange}
